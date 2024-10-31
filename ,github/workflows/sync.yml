@@ -1,0 +1,28 @@
+name: "Main"
+on: [push]
+
+permissions: write-all
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup example secrets
+        shell: bash
+        run: |
+          ENVROLEID=$((RANDOM))
+          echo "::add-mask::$ENVROLEID"
+          echo ENVROLEID=$ENVROLEID >> $GITHUB_ENV
+          ENVSECRETID=$((RANDOM))
+          echo "::add-mask::$ENVSECRETID"
+          echo ENVSECRETID=$ENVSECRETID >> $GITHUB_ENV
+  
+      - name: Copy Secrets to GitHub
+        shell: bash
+        run: |
+          gh secret set roleid --body $ROLEID
+          gh secret set secretid --body $SECRETID
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ROLEID: ${{ env.ENVROLEID }}
+          SECRETID: ${{ env.ENVSECRETID }}
